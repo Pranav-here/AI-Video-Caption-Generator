@@ -15,3 +15,12 @@ def extract_audio(video_path, output_audio_path):
     
     except Exception as e:
         print(f"[!] There was an error extracting the audio:  {e}")
+
+
+if __name__=="__main__":
+    video_file="videos/sample_video.mp4"
+    audio_output= "audio/sample_audio.wav"
+
+    os.makedirs(os.path.dirname(audio_output), exist_ok=True)
+
+    extract_audio(video_file, audio_output)

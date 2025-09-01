@@ -1,0 +1,24 @@
+# uv-managed virtual environment
+.venv/
+
+# Python cache and compiled files
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editors
+.vscode/
+.idea/
+
+# Streamlit secrets and local state
+.streamlit/secrets.toml
+
+# Logs and temp
+*.log
+*.tmp
+*.temp

@@ -1,26 +1,44 @@
-from moviepy.editor import VideoFileClip
+# extract_audio.py
+
 import os
+import argparse
+from moviepy.editor import VideoFileClip
 
 
-# Step 1: Extract audio from the video and save it somewhere
-def extract_audio(video_path, output_audio_path):
-    try:
-        video = VideoFileClip(video_path)
-        audio = video.audio
-        if audio:
-            audio.write_audiofile(output_audio_path)
-            print(f"Audio extracted successfully: {output_audio_path}")
-        else:
-            print(f"No audio tract found in the video")
-    
-    except Exception as e:
-        print(f"[!] There was an error extracting the audio:  {e}")
+def extract_audio(video_path: str, output_audio_path: str) -> None:
+    """
+    Pull audio from a video and write a 16 kHz mono WAV.
+    """
+    if not os.path.isfile(video_path):
+        raise FileNotFoundError(f"Video not found: {video_path}")
+
+    os.makedirs(os.path.dirname(output_audio_path), exist_ok=True)
+
+    # Use context manager so resources get closed properly
+    with VideoFileClip(video_path) as clip:
+        if clip.audio is None:
+            print("No audio track found in the video.")
+            return
+        # 16 kHz mono PCM WAV plays nicest with Whisper
+        clip.audio.write_audiofile(
+            output_audio_path,
+            fps=16000,
+            nbytes=2,
+            codec="pcm_s16le",
+            ffmpeg_params=["-ac", "1"],
+            verbose=False,
+            logger=None,
+        )
+    print(f"Audio extracted: {os.path.abspath(output_audio_path)}")
 
 
-if __name__=="__main__":
-    video_file="videos/sample_video.mp4"
-    audio_output= "audio/sample_audio.wav"
+def main() -> None:
+    p = argparse.ArgumentParser()
+    p.add_argument("video", help="Path to input video")
+    p.add_argument("audio_out", help="Path to output WAV (e.g., audio/sample_audio.wav)")
+    args = p.parse_args()
+    extract_audio(args.video, args.audio_out)
 
-    os.makedirs(os.path.dirname(audio_output), exist_ok=True)
 
-    extract_audio(video_file, audio_output)
+if __name__ == "__main__":
+    main()
